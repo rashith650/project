@@ -1,4 +1,4 @@
-# Object Detection-project
+# project
 ## Aim
 To write a python program using OpenCV to do the following image manipulations.
 i) Extract ROI from  an image.
@@ -44,103 +44,166 @@ Set the model and Threshold to 0.5
 Flatten the index,confidence.
 ### Step8:
 Display the result.
-## Program:
-## I)Perform ROI from an image
-```python
-#Import necessary packages 
+
+
+## i) Extract ROI from  an image
+
+## PROGRAM
+
+
+```py
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
 
-# Read the image and convert the image into RGB
-image_path = 'dog.jpg'
+# In[42]:Read the image and convert the image into RGB
+image_path = 'bird1.jpg'
 img = cv2.imread(image_path)
 img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
 
-# Display the image
+# In[44]:Display the image
 plt.imshow(img_rgb)
 plt.title('Original Image')
 plt.axis('off')
 plt.show()
 
 
-# Create an ROI mask
-roi_mask = np.zeros_like(image_rgb)
-roi_mask[100:250, 100:250, :] = 255  # Define the ROI region(Dog-face)
+# Step 4: Set the pixels to display the ROI (Region of Interest)
+# Define the coordinates for the Region of Interest (ROI)
+# (startY:endY, startX:endX)
+roi = img[100:420, 200:550]  # ROI coordinates (adjust as needed)
 
-# Segment the ROI using bitwise AND operation
-segmented_roi = cv2.bitwise_and(image_rgb, roi_mask)
+# Create a blank mask of the same size as the original image
+mask = np.zeros_like(img)
 
-# Step 5: Display the segmented ROI
-plt.imshow(segmented_roi)
-plt.title('Segmented ROI')
+# Place the ROI on the mask
+mask[100:420, 200:550] = roi
+
+# Step 5: Perform bitwise conjunction of the two arrays using bitwise_and
+segmented_roi = cv2.bitwise_and(img, mask)
+
+
+# Step 6: Display the segmented ROI from the image
+segmented_roi_rgb = cv2.cvtColor(segmented_roi, cv2.COLOR_BGR2RGB)
+plt.imshow(segmented_roi_rgb)
+plt.title("Segmented ROI")
 plt.axis('off')
-
-# Show both images side by side
 plt.show()
 ```
-## II)Perform handwritting detection in an image
-```python
+
+## OUTPUT
+
+![image](https://github.com/user-attachments/assets/92404c73-df4d-4909-8ffe-3e75ce9f7eec)
+![image](https://github.com/user-attachments/assets/a104ee1a-577d-4ddb-ba82-b81b942a7493)
+
+
+## ii) Perform handwritting detection in an image.
+
+## PROGRAM
+
+```py
+
+
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
+
+# In[3]:Define a function to read the image,Convert the image to grayscale,
+#Apply Gaussian blur to reduce noise and improve edge detection,
+#Use Canny edge detector to find edges in the image,
+#Find contours in the edged image,
+#Filter contours based on area to keep only potential text regions,
+#Draw bounding boxes around potential text regions.
+
+
 def detect_handwriting(image_path):
+    # Read the image
     img = cv2.imread(image_path)
+
+    # Convert the image to grayscale
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    # Apply Gaussian blur to reduce noise and improve edge detection
     blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+
+    # Use Canny edge detector to find edges in the image
     edges = cv2.Canny(blurred, 50, 150)
+
+    # Find contours in the edged image
     contours, _ = cv2.findContours(edges.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    # Filter contours based on area to keep only potential text regions
     min_area = 100
     text_contours = [cnt for cnt in contours if cv2.contourArea(cnt) > min_area]
+
+    # Draw bounding boxes around potential text regions
     img_copy = img.copy()
     for contour in text_contours:
         x, y, w, h = cv2.boundingRect(contour)
         cv2.rectangle(img_copy, (x, y), (x + w, y + h), (0, 255, 0), 2)
-        
+
+    # Display the result
     img_rgb = cv2.cvtColor(img_copy, cv2.COLOR_BGR2RGB)
     plt.imshow(img_rgb)
     plt.title('Handwriting Detection')
     plt.axis('off')
     plt.show()
-    
-image_path = 'handwriting.jpg'
+
+# Path to the image containing handwriting
+image_path ='handwriting.jpg'
+
+# Perform handwriting detection
 detect_handwriting(image_path)
+# Display the image
 ```
-## III)Perform object detection with label in an image
-```python
-# Import necessary packages 
+
+## OUTPUT
+
+![image](https://github.com/user-attachments/assets/ac6bc656-8c21-4992-b792-81c527c72131)
+
+## iii) Perform object detection with label in an image
+
+## PROGRAM
+
+```py
+
 import cv2
 import matplotlib.pyplot as plt
 
-# Set and add the config_file,weights to ur folder.
+# In[4]:Set and add the config_file,weights to ur folder.
+
 config_file='ssd_mobilenet_v3_large_coco_2020_01_14.pbtxt'
 frozen_model='frozen_inference_graph.pb'
 
-# Use a pretrained Dnn model (MobileNet-SSD v3)
+# In[5]:Use a pretrained Dnn model (MobileNet-SSD v3)
+
 model=cv2.dnn_DetectionModel(frozen_model,config_file)
 
-# Create a classLabel and print the same
+# In[6]:Create a classLabel and print the same
 classLabels = []
 file_name='Labels.txt'
 with open(file_name,'rt')as fpt:
     classLabels=fpt.read().rstrip('\n').split('\n')
 
-# Print the classLabels
+# In[7]:Print the classLabels
 print(classLabels)
 
+# In[8]:
 print(len(classLabels))
 
-# Display the image using imshow()
-img=cv2.imread('download.jpeg')
+# In[9]:Display the image using imshow()
+img=cv2.imread('car.jpg')
 plt.imshow(img)
 
+
+# In[10]:
 plt.imshow(cv2.cvtColor(img,cv2.COLOR_BGR2RGB))
 
 
-# Set the model and Threshold to 0.5
+# In[11]:Set the model and Threshold to 0.5
 model.setInputSize(320,320)
 model.setInputScale(1.0/127.5)#255/2=127.5
 model.setInputMean((127.5,127.5,127.5))
@@ -149,7 +212,7 @@ ClassIndex,confidence,bbox=model.detect(img,confThreshold=0.5)
 print(ClassIndex)
 
 
-# Flatten the index,confidence.
+# In[29]:Flatten the index,confidence.
 font_scale=3
 font=cv2.FONT_HERSHEY_PLAIN
 for ClassInd,conf,boxes in zip(ClassIndex.flatten(),confidence.flatten(),bbox):
@@ -157,21 +220,8 @@ for ClassInd,conf,boxes in zip(ClassIndex.flatten(),confidence.flatten(),bbox):
     cv2.putText(img,classLabels[ClassInd-1],(boxes[0]+10,boxes[1]+40),font,fontScale=font_scale,color=(255,0,0),thickness=1)
 
 
-# Display the result.
+# In[30]:Display the result.
 plt.imshow(cv2.cvtColor(img,cv2.COLOR_BGR2RGB))
 ```
-## I)Perform ROI from an image:
-![image](https://github.com/user-attachments/assets/11627702-9190-4884-af45-77c41e59f524)
-![image](https://github.com/user-attachments/assets/56ea969f-2059-454b-9185-9bde1298dff5)
-
-## II)Perform handwritting detection in an image:
-![image](https://github.com/user-attachments/assets/66b135af-5b6f-4678-8933-abe1ccd75e7a)
-
-## III)Perform object detection with label in an image:
-![image](https://github.com/swethamohanraj/project/assets/94228215/f013cf98-0fa0-4ce4-9fa9-f9b12747a90e)
-![image](https://github.com/swethamohanraj/project/assets/94228215/3e4a66ff-a37e-45b2-be39-1ddb487d19a4)
-## Result :
-Thus a python program using OpenCV is written to do the following image manipulations:
-
-i) Extract ROI from an image. ii) Perform handwritting detection in an image. iii) Perform object detection with label in an image.
-
+## OUTPUT
+![image](https://github.com/user-attachments/assets/0e6349f4-6f3e-490a-ba50-0bb5c8651435)
